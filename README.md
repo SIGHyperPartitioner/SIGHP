@@ -21,9 +21,9 @@ After building project you can run SIGHP by:
 
 |Parameter|Effect|
 |---|---|
-|-i|(nessesary) Path for input hypergraph dataset|
-|-n|(nessesary) Number of vertices in the input dataset|
-|-m|(nessesary) Number of hyperedge in the input dataset|
+|-i|(nessesary*) Path for input hypergraph dataset|
+|-n|(nessesary*) Number of vertices in the input dataset|
+|-m|(nessesary*) Number of hyperedge in the input dataset|
 |-p|(optional) Number of partition blocks, default as 16|
 |-sheild|(optional) Hubedge shielding ratio, default as 0.2|
 |-save|(optional) Partition Scheme Save Path; If not set, no output will be generated|
@@ -43,6 +43,6 @@ vid eid
 vid eid
 ```
 Ensure that vid is less than the input parameter n, and eid is less than the input parameter m.
-## License
 
-Specify the license information for your project here.
+## License
+This project is licensed under the [MIT License](LICENSE).
