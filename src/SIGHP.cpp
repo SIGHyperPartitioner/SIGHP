@@ -130,7 +130,7 @@ void load_data(std::string path,HyperNode * Node,HyperEdge * Edge){
     }
 }
 
-void solve(int n,int m,std::string path, int p,double sheild = 0,std::string method = "entropy",std::string output = "None"){
+void solve(int n,int m,std::string path, int p,double sheild = 0,std::string output = "None"){
     // n: number of HyperNode
     // m: number of HyperEdge
     // Node: array of HyperNode
@@ -163,76 +163,55 @@ void solve(int n,int m,std::string path, int p,double sheild = 0,std::string met
     int maxi_degree = 0;
 
     Score_List score_list(maxi_degree,n);
-    if(method == "anti-basic"){
-        int max_val = -1;
-        int cnt = 0;
-        for(int i=0;i<n;i++) max_val = std::max(max_val,int(Node[i].edges.size())+1);
-        for(int i=0;i<n;i++){
-            score_list.add(i,max_val-Node[i].edges.size());
-        }
-    }
 
     int cnt = 0;
     int cur_p = 0;
     for(int i = 0; i < p; i++) part_node.push_back(std::unordered_map<int,int>());
     for(int i = 0; i < p; i++) part_edge.push_back(std::unordered_map<int,int>());  
 
-    if(method == "random"){
-        for(int i = 0 ; i < n; i++){
-            int send_p = rand()%p;
-            part_node[send_p][i] = 1;
-            for(auto &e_id:Node[i].edges){
-                part_edge[send_p][e_id] = 1;
-            }
-        }
+    double c = total_edge * sheild;
+    int pos = Emaxi_degree;
+    while(c>0) {
+        c -= Esum[pos]*pos;
+        pos--;
     }
-    else{
-        double c = total_edge * sheild;
-        int pos = Emaxi_degree;
-        while(c>0) {
-            c -= Esum[pos]*pos;
-            pos--;
-        }
-        sheild = pos + 1;
-        // int pos = 0;
-        // while(c>0) c-= edge_degree[pos++];
-        // sheild = ed
-        while(cnt < n){   
-            cnt ++; 
-            int add_node = score_list.top();
-            score_list.erase(add_node);
-            part_node[cur_p][add_node] = 1;
+    sheild = pos + 1;
+    // int pos = 0;
+    // while(c>0) c-= edge_degree[pos++];
+    // sheild = ed
+    while(cnt < n){   
+        cnt ++; 
+        int add_node = score_list.top();
+        score_list.erase(add_node);
+        part_node[cur_p][add_node] = 1;
 
-            for(auto &e_id:Node[add_node].edges){
-                part_edge[cur_p][e_id] += 1;
-                if(Edge[e_id].degree>sheild) continue;
-                if(part_edge[cur_p][e_id] == 1){
-                    double val ;
-                    if(method == "entropy") val = Mlog[Edge[e_id].degree] - Mlog[Emaxi_degree] + 0.000001;
-                    else if (method == "basic") val = 1; 
-                    else if (method == "anti-basic") val = 1; 
-                    else assert(false);
+        for(auto &e_id:Node[add_node].edges){
+            part_edge[cur_p][e_id] += 1;
+            if(Edge[e_id].degree>sheild) continue;
+            if(part_edge[cur_p][e_id] == 1){
+                double val ;
+                val = Mlog[Edge[e_id].degree] - Mlog[Emaxi_degree] + 0.000001;
 
 // #pragma omp parallel for
-                    for(int i=0;i<Edge[e_id].degree;i++){
-                        int n_id = Edge[e_id].nodes[i];
-                        score_list.add(n_id,val);
-                        // if(score_list.Eval[n_id] == W[n_id]){
-                        //     cnttt ++;
-                        //     part_node[cur_p][n_id] = 1;
-                        //     score_list.erase(n_id);
-                        //     cnt++;    
-                        // }
-                        // if(part_node[cur_p].size() >= maxi_cap) break;
-                    }
+                for(int i=0;i<Edge[e_id].degree;i++){
+                    int n_id = Edge[e_id].nodes[i];
+                    score_list.add(n_id,val);
+                    // if(score_list.Eval[n_id] == W[n_id]){
+                    //     cnttt ++;
+                    //     part_node[cur_p][n_id] = 1;
+                    //     score_list.erase(n_id);
+                    //     cnt++;    
+                    // }
+                    // if(part_node[cur_p].size() >= maxi_cap) break;
                 }
             }
-            if(part_node[cur_p].size() >= maxi_cap){   
-                score_list.clear();
-                cur_p += 1;
-            }
+        }
+        if(part_node[cur_p].size() >= maxi_cap){   
+            score_list.clear();
+            cur_p += 1;
         }
     }
+
     clock_t end_time = clock();
     int k_1 = 0;
     for(int i=0;i<p;i++) {
@@ -263,7 +242,6 @@ void parsingCmd(int argc,char *argv[]){
     n = 56530;
     m = 120869;
     int p = 16;
-    std::string method = "entropy";
     double sheild_heavy_node = 0.2;
     std::string save = "None";
 
@@ -277,8 +255,6 @@ void parsingCmd(int argc,char *argv[]){
             m = std::stoi(argv[i + 1]);
         }else if(std::string(argv[i]) == "-p" && i + 1 < argc){
             p = std::stoi(argv[i + 1]);
-        }else if(std::string(argv[i]) == "-method" && i + 1 < argc){
-            method = std::string(argv[i + 1]);
         }else if(std::string(argv[i]) == "-sheild" && i + 1 < argc){
             sheild_heavy_node = strtod(argv[i + 1], NULL);
         }else if(std::string(argv[i]) == "-save" && i + 1 < argc){
@@ -288,9 +264,9 @@ void parsingCmd(int argc,char *argv[]){
 
     std::cout<<"parameters:"<<std::endl;
     std::cout<<"dataset:"<<input<<"\tn:"<<n<<"\tm:"<<m<<std::endl;
-    std::cout<<"method:"<<method<<"\tp:"<<p<<"\tsheild:"<<sheild_heavy_node<<std::endl;
+    std::cout<<"p:"<<p<<"\tsheild:"<<sheild_heavy_node<<std::endl;
     std::cout<<"save partitionFile:"<<save<<std::endl;
-    solve(n,m,input,p,sheild_heavy_node,method,save);
+    solve(n,m,input,p,sheild_heavy_node,save);
 }
 int main(int argc,char *argv[]){
     parsingCmd(argc,argv);
