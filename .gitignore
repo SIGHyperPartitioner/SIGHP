@@ -1,4 +1,6 @@
 tmp/
 EdgeList2VertexSet
 .vscode/
+*.txt
+*.log
 
