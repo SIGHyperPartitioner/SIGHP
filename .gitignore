@@ -3,4 +3,5 @@ EdgeList2VertexSet
 .vscode/
 *.txt
 *.log
-
+BA-Generator
+Random-Generator

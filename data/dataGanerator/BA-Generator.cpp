@@ -1,9 +1,9 @@
 #include <bits/stdc++.h>
 using namespace std;
 typedef long long ll;
-const ll n = 1e9;
+const ll n = 5e8;
 const ll m = 2;
-string outfile = "../BA-2B.txt";
+string outfile = "../BA-1B.txt";
 vector<vector<ll> > Node(n);
 vector<ll> degree;
 
