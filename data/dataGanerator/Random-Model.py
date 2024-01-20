@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 def log(content):
     import time
     import pytz
-    import datetimeq
+    import datetime
 
     timestamp = datetime.datetime.now()
     desired_timezone = pytz.timezone('Asia/Shanghai')
@@ -15,18 +15,18 @@ def log(content):
 
 
 # 生成 BA 图
-n = 1e6  # 节点数
-m = 1    # 新增边数
-outFile = open("../BA-1M.txt","w") 
+n = int(1e9)  # 节点数
+m = int(1e9)    # 总边数
+outFile = open("../random-1B.txt","w") 
 
 log("generate graph")
-ba_graph = nx.barabasi_albert_graph(n, m)
+random_graph = nx.gnm_random_graph(n, m)
 log("finished")
 # degree_sequence = sorted([d for n, d in ba_graph.degree()], reverse=True)
 # degree_count = nx.degree_histogram(ba_graph)
 
-for node in ba_graph.nodes():
-    for nid in list(ba_graph.neighbors(node)):
+for node in random_graph.nodes():
+    for nid in list(random_graph.neighbors(node)):
         outFile.write(str(node)+" "+str(nid)+"\n")
     
 outFile.close()
