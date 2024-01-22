@@ -1,10 +1,10 @@
 #include <bits/stdc++.h>
 using namespace std;
 typedef unsigned long long ll;
-const ll n = 1e6;
-const ll m = 5e6;
-string outfile = "../random-5M.txt";
-vector<vector<ll> > Node(n+1);
+const ll n = 1e8;
+const ll m = 5e8;
+string outfile = "../random-500M.txt";
+vector<vector<ll> > Node(n+1)
 
 std::random_device rd;
 std::mt19937_64 engine(rd());  // 使用随机设备作为种子

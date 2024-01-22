@@ -119,8 +119,6 @@ void load_data(std::string path,HyperNode * Node,HyperEdge * Edge){
             else if (mapped[i] == ' ') cur = 1;
             else if (mapped[i] == '\n'){
                 cur = 0;
-                // if(e[0] >= Node.size()) Node.push_back(std::std::vector<int>());
-                // if(e[1] >= Edge.size()) Edge.push_back(std::std::vector<int>());
                 Node[e[0]].edges.push_back(e[1]);
                 Edge[e[1]].nodes.push_back(e[0]);
                 e[0] = e[1] = 0;
