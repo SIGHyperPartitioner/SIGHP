@@ -244,7 +244,6 @@ void parsingCmd(int argc,char *argv[]){
     std::string save = "None";
 
     for (int i = 1; i < argc; ++i) {
-        // 检查是否有 -o 选项
         if (std::string(argv[i]) == "-i" && i + 1 < argc) {
             input = argv[i + 1];
         }else if(std::string(argv[i]) == "-n" && i + 1 < argc){

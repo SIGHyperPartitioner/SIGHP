@@ -8,7 +8,7 @@ vector<vector<ll> > Node(n);
 vector<ll> degree;
 
 std::random_device rd;
-std::mt19937_64 engine(rd());  // 使用随机设备作为种子
+std::mt19937_64 engine(rd());  
 std::uniform_int_distribution<uint64_t> distribution;
 
 ll rand64(){
