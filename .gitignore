@@ -5,3 +5,4 @@ EdgeList2VertexSet
 *.log
 BA-Generator
 Random-Generator
+build/

@@ -128,7 +128,7 @@ void load_data(std::string path,HyperNode * Node,HyperEdge * Edge){
     }
 }
 
-void solve(int n,int m,std::string path, int p,double sheild = 0,std::string output = "None"){
+void solve(int n,int m,std::string path, int p,double sheild = 0,std::string output = "None", double e = 0){
     // n: number of HyperNode
     // m: number of HyperEdge
     // Node: array of HyperNode
@@ -155,7 +155,7 @@ void solve(int n,int m,std::string path, int p,double sheild = 0,std::string out
             Emaxi_degree = std::max(Emaxi_degree,Edge[i].degree);
     }
 
-    int maxi_cap = n/p + 1;
+    int maxi_cap = (n/p)*(1+e) + 1;
     std::vector<std::unordered_map<int,int> > part_node;
     std::vector<std::unordered_map<int,int> > part_edge;
     int maxi_degree = 0;
@@ -242,6 +242,7 @@ void parsingCmd(int argc,char *argv[]){
     int p = 16;
     double sheild_heavy_node = 0.2;
     std::string save = "None";
+    double e = 0;
 
     for (int i = 1; i < argc; ++i) {
         if (std::string(argv[i]) == "-i" && i + 1 < argc) {
@@ -256,6 +257,8 @@ void parsingCmd(int argc,char *argv[]){
             sheild_heavy_node = strtod(argv[i + 1], NULL);
         }else if(std::string(argv[i]) == "-save" && i + 1 < argc){
             save = argv[i + 1];
+        }else if(std::string(argv[i]) == "-e" && i + 1 < argc){
+            e = strtod(argv[i + 1], NULL);
         }
     }
 
@@ -263,7 +266,7 @@ void parsingCmd(int argc,char *argv[]){
     std::cout<<"dataset:"<<input<<"\tn:"<<n<<"\tm:"<<m<<std::endl;
     std::cout<<"p:"<<p<<"\tsheild:"<<sheild_heavy_node<<std::endl;
     std::cout<<"save partitionFile:"<<save<<std::endl;
-    solve(n,m,input,p,sheild_heavy_node,save);
+    solve(n,m,input,p,sheild_heavy_node,save,e);
 }
 int main(int argc,char *argv[]){
     parsingCmd(argc,argv);
