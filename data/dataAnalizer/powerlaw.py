@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-filepath= "../random-5M.txt"
+filepath= "../out.github"
 Edge = {}
 Node = {}
 
