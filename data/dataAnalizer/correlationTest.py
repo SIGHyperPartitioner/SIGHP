@@ -21,9 +21,9 @@ rcParams.update(rc_fonts)
 # filepath= "../../../hypergraph/data/trec-swap.txt"
 Edge = {}
 Node = {}
-fig, axes = plt.subplots(1, 2, figsize=(9, 4))
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
 
-def draw(data, data2):
+def draw(data, data2, label = ""):
     mp = {}
     vec = []
     for i in data:
@@ -34,7 +34,7 @@ def draw(data, data2):
     value = [mp[i]/len(data) * 100 for i in vec]
     for i in range(1, len(value)):
         value[i] += value[i - 1]
-    axes[0].plot(vec, value)
+    axes[0].plot(vec, value, label = label)
     axes[0].set_xlabel("Jaccard Similarity")
     axes[0].set_ylabel("Percentage Vertices %")
     axes[0].yaxis.grid(True, linestyle='--', linewidth=0.5, alpha=0.7)
@@ -52,7 +52,7 @@ def draw(data, data2):
     value = [mp[i]/len(data2) * 100 for i in vec]
     for i in range(1, len(value)):
         value[i] += value[i - 1]
-    axes[1].plot(vec, value)
+    axes[1].plot(vec, value,label = label)
     axes[1].set_xlabel("P(AB)/P(A)P(B)")
     axes[1].set_ylabel("Percentage Vertices %")
     axes[1].yaxis.grid(True, linestyle='--', linewidth=0.5, alpha=0.7)
@@ -77,7 +77,7 @@ def progress_bar(iteration, total, prefix='', suffix='', length=50, fill='█'):
     sys.stdout.write('\r%s |%s| %s%% %s' % (prefix, bar, percent, suffix))
     sys.stdout.flush()
 
-filepaths = ["../BA-1e4.txt", "../BA-5e4.txt", "../BA-1e5.txt", "../BA-5e4.txt", "../BA-1e6.txt"]
+filepaths = ["../BA-1e4.txt", "../BA-5e4.txt", "../BA-1e5.txt", "../BA-5e5.txt", "../BA-1e6.txt"]
 for filepath in filepaths:
 # filepath= "../BA-1e4.txt"
     n = 0
@@ -128,6 +128,10 @@ for filepath in filepaths:
 
     correlation = sorted(correlation)
     correlation2 = sorted(correlation2)
-    draw(correlation,correlation2)
+    draw(correlation,correlation2,filepath[3:-4])
 
+lines, labels = fig.axes[0].get_legend_handles_labels()
+print(lines, labels)
+fig.legend( lines, labels, ncol=5, framealpha=1, loc='upper center',  bbox_to_anchor=(0.5, 1.03), fontsize=15, frameon=False, handlelength=2.0, handletextpad=1)
+plt.subplots_adjust(top=0.75)
 plt.savefig('./pic/'+ filepath.split('/')[-1] +'-corre-overall.pdf')
