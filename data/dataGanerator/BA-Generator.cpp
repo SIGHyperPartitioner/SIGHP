@@ -1,10 +1,10 @@
 #include <bits/stdc++.h>
 using namespace std;
 typedef long long ll;
-const ll n = 5e8;
+const ll n = 1e3;
 const ll m = 2;
-string outfile = "../BA-1B.txt";
-vector<vector<ll> > Node(n);
+string outfile = "../BA-5e3.txt";
+vector<vector<ll> > Node(n+5);
 vector<ll> degree;
 
 std::random_device rd;
