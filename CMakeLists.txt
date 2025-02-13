@@ -1,6 +1,55 @@
-cmake_minimum_required(VERSION 3.16)  # 指定CMake的最低版本
+# Minimum CMake version required
+cmake_minimum_required(VERSION 3.16)
 
-project(SIGHP)  # 设置项目名称
+# Project name and version
+project(SIGHP VERSION 1.0.0 LANGUAGES CXX)
 
-add_executable(SIGHP src/SIGHP.cpp)  # 添加可执行文件及其源文件
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Set build type if not specified
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+# Compiler flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+
+# Optional OpenMP support
+option(USE_OPENMP "Enable OpenMP support" OFF)
+if(USE_OPENMP)
+    find_package(OpenMP)
+    if(OpenMP_CXX_FOUND)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    endif()
+endif()
+
+# Set source directory
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+# Include directories
+include_directories(${SOURCE_DIR})
+
+# Add executable
+add_executable(${PROJECT_NAME} src/SIGHP.cpp)
+
+# Set output directory
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+
+# System-specific configurations
+if(UNIX)
+    add_definitions(-DUNIX_SYSTEM)
+elseif(WIN32)
+    add_definitions(-DWIN32_SYSTEM)
+endif()
+
+# Check for required headers
+include(CheckIncludeFiles)
+check_include_files(sys/mman.h HAVE_MMAN_H)
+if(NOT HAVE_MMAN_H)
+    message(FATAL_ERROR "Required header sys/mman.h not found")
+endif()
 

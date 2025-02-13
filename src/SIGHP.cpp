@@ -91,12 +91,12 @@ public:
         for(int i=0; i< degree_mp.size();i++) degree_mp[i].clear();
     }
 };
-void load_data(std::string path,HyperNode * Node,HyperEdge * Edge){
-    // swap(n,m);
+void load_data(std::string path, HyperNode * Node, HyperEdge * Edge){
+    // Open file
     int fd;
     struct stat sb;
     if ((fd = open(path.c_str(), O_RDONLY)) < 0) {  
-            perror("open file error!");  
+        perror("open file error!");  
     }  
 
     if ((fstat(fd, &sb)) == -1) {  
@@ -107,17 +107,28 @@ void load_data(std::string path,HyperNode * Node,HyperEdge * Edge){
     Int64 offset = 0;
     Int64 e[2];
     e[0] = e[1] = 0;
-    const size_t BUFFER_SIZE = sysconf(_SC_PAGESIZE) * 256; 
-    char* buffer = new char[BUFFER_SIZE];
-    setvbuf(file, buffer, _IOFBF, BUFFER_SIZE);
+    // Calculate optimal buffer size based on system page size
+    const size_t BUFFER_SIZE = sysconf(_SC_PAGESIZE) * 256;
     int cur = 0;
 
     while(offset < fileSize){
-        Int64 length = std::min(fileSize - offset, blockSize);
-            char* mapped = (char *)mmap(NULL, length, PROT_READ , MAP_PRIVATE, fd, offset);
-        for(int i=0;i<length ;i++){
-            if(mapped[i] >= '0' && mapped[i] <='9') e[cur] = e[cur]*10 + mapped[i] - '0';
-            else if (mapped[i] == ' ') cur = 1;
+        // Map file chunk into memory
+        Int64 length = std::min(fileSize - offset, (Int64)BUFFER_SIZE);
+        char* mapped = (char *)mmap(NULL, length, PROT_READ, MAP_PRIVATE, fd, offset);
+        if (mapped == MAP_FAILED) {
+            perror("mmap failed");
+            close(fd);
+            return;
+        }
+
+        // Process mapped data
+        for(int i = 0; i < length; i++){
+            if(mapped[i] >= '0' && mapped[i] <= '9') {
+                e[cur] = e[cur] * 10 + (mapped[i] - '0');
+            }
+            else if (mapped[i] == ' ') {
+                cur = 1;
+            }
             else if (mapped[i] == '\n'){
                 cur = 0;
                 Node[e[0]].edges.push_back(e[1]);
@@ -125,8 +136,14 @@ void load_data(std::string path,HyperNode * Node,HyperEdge * Edge){
                 e[0] = e[1] = 0;
             }
         }
+
+        // Unmap current chunk
+        munmap(mapped, length);
         offset += length;
     }
+
+    // Close file descriptor
+    close(fd);
 }
 
 void solve(int n,int m,std::string path, int p,double sheild = 0,std::string output = "None", double e = 0){

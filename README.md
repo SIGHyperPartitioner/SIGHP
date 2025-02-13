@@ -47,7 +47,7 @@ After building project you can run SIGHP by:
 
 So for example a valid command is:
 ```
-./SIGHP -i ../data/out.github -n 56530 -m 120869 
+./bin/SIGHP -i ../data/out.github -n 56530 -m 120869 
 ```
 
 ## Input Formate
