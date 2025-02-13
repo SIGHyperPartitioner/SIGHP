@@ -1,5 +1,3 @@
-
-
 #pragma GCC optimize(2)
 #include <cmath>
 #include <stdlib.h>
@@ -12,6 +10,7 @@
 #include <sys/mman.h>     
 #include <fcntl.h>  
 // #include <omp.h>
+
 
 typedef long long Int64;
 int n,m;
@@ -108,7 +107,9 @@ void load_data(std::string path,HyperNode * Node,HyperEdge * Edge){
     Int64 offset = 0;
     Int64 e[2];
     e[0] = e[1] = 0;
-    Int64 blockSize = 16 * 1024 * 100;
+    const size_t BUFFER_SIZE = sysconf(_SC_PAGESIZE) * 256; 
+    char* buffer = new char[BUFFER_SIZE];
+    setvbuf(file, buffer, _IOFBF, BUFFER_SIZE);
     int cur = 0;
 
     while(offset < fileSize){
