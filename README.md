@@ -1,6 +1,22 @@
 # SIGHP
 A hypergraph partitioner designed around the principles of information theory, capable of handling extremely large hypergraphs with up to billions of vertices using a single thread. The source code is implemented in C++.
 
+## Key Features
+- 🚀 High-performance single-threaded processing
+- 📊 Information theory based partitioning strategy
+- 💾 Memory-efficient implementation with mmap
+- 🛡️ Advanced hubedge shielding mechanism
+- ⚖️ Flexible imbalance tolerance control
+- 📈 Scalable to billion-scale graphs
+- 🔧 Easy-to-use command line interface
+
+## System Requirements
+- Operating System: Linux/Unix (Ubuntu 20.04 recommended)
+- Compiler: C++17 compatible (GCC 9.4+ or Clang)
+- CMake: Version 3.16 or higher
+- Memory: Minimum 16GB RAM recommended
+- Storage: SSD recommended for large datasets
+
 ## How to build
 To build SIGHP, make sure you have CMake(>=3.16) and a C++17 compatible compiler, such as clang or gcc installed. Tested were GCC9.4 in Ubuntu 20.04.
 
