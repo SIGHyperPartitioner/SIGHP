@@ -1,5 +1,5 @@
 # Minimum CMake version required
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.10)
 
 # Project name and version
 project(SIGHP VERSION 1.0.0 LANGUAGES CXX)
@@ -33,6 +33,9 @@ set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 # Include directories
 include_directories(${SOURCE_DIR})
 
+# Find MPI package
+find_package(MPI REQUIRED)
+
 # Add executable
 add_executable(${PROJECT_NAME} src/SIGHP.cpp)
 
@@ -52,4 +55,16 @@ check_include_files(sys/mman.h HAVE_MMAN_H)
 if(NOT HAVE_MMAN_H)
     message(FATAL_ERROR "Required header sys/mman.h not found")
 endif()
+
+# Add MPI compile options
+add_compile_options(-O3)
+
+# Add MPI include directories
+include_directories(${MPI_INCLUDE_PATH})
+
+# Add MPI executable
+add_executable(sighp_mpi src/SIGHP_MPI.cpp)
+
+# Link MPI libraries
+target_link_libraries(sighp_mpi ${MPI_CXX_LIBRARIES})
 

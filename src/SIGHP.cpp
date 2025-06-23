@@ -1,4 +1,3 @@
-#pragma GCC optimize(2)
 #include <cmath>
 #include <stdlib.h>
 #include "data.hpp"
@@ -9,7 +8,7 @@
 #include <sys/stat.h>
 #include <sys/mman.h>     
 #include <fcntl.h>  
-// #include <omp.h>
+#include <omp.h>
 
 
 typedef long long Int64;
@@ -36,6 +35,7 @@ public:
         cur_maxi = 0;
         this->maxi_degree = Maxi_degree;
         this->num_node = Num_node;
+        #pragma omp parallel for schedule(static)
         for(int i=0; i<=Maxi_degree;i++){
             degree_mp.push_back(std::unordered_map<int,int>());
         }
@@ -88,6 +88,7 @@ public:
     void clear(){
         Eval = std::unordered_map<int,double>();
         cur_maxi = 0;
+        #pragma omp parallel for schedule(static)
         for(int i=0; i< degree_mp.size();i++) degree_mp[i].clear();
     }
 };
@@ -155,7 +156,7 @@ void solve(int n,int m,std::string path, int p,double sheild = 0,std::string out
     // sheild: sheild update edge degree(log)
     // eval function: log 1 or 1/x
     //output: output partition infomation
-    clock_t beg_time = clock(); 
+    auto beg_time = std::chrono::high_resolution_clock::now(); 
 
     Node = new HyperNode[n];
     Edge = new HyperEdge[m];
@@ -195,48 +196,56 @@ void solve(int n,int m,std::string path, int p,double sheild = 0,std::string out
     // int pos = 0;
     // while(c>0) c-= edge_degree[pos++];
     // sheild = ed
+    auto end_time_2 = std::chrono::high_resolution_clock::now();
+    double runtime_2 = std::chrono::duration_cast<std::chrono::milliseconds>(end_time_2 - beg_time).count();
+    std::cout<<"Initial time:"<<runtime_2 <<" ms"<<std::endl;
+    int cntt = 0;
     while(cnt < n){   
         cnt ++; 
         int add_node = score_list.top();
         score_list.erase(add_node);
         part_node[cur_p][add_node] = 1;
-
+        // std::cout<<"add_node:"<<add_node<<std::endl;
         for(auto &e_id:Node[add_node].edges){
-            part_edge[cur_p][e_id] += 1;
-            if(Edge[e_id].degree>sheild) continue;
-            if(part_edge[cur_p][e_id] == 1){
-                double val ;
-                val = Mlog[Edge[e_id].degree] - Mlog[Emaxi_degree] + 0.000001;
+            const int e_degree = Edge[e_id].nodes.size();
+            const auto& e_nodes = Edge[e_id].nodes;
 
-// #pragma omp parallel for
-                for(int i=0;i<Edge[e_id].degree;i++){
-                    int n_id = Edge[e_id].nodes[i];
+            part_edge[cur_p][e_id] += 1;
+            if(e_degree>sheild) continue;
+            if(part_edge[cur_p][e_id] == 1){
+                cntt ++;
+                double val ;
+                val = Mlog[e_degree] - Mlog[Emaxi_degree] + 0.000001;
+                for(int i=0;i<e_degree;i++){
+                    int n_id = e_nodes[i];
                     score_list.add(n_id,val);
-                    // if(score_list.Eval[n_id] == W[n_id]){
-                    //     cnttt ++;
-                    //     part_node[cur_p][n_id] = 1;
-                    //     score_list.erase(n_id);
-                    //     cnt++;    
-                    // }
-                    // if(part_node[cur_p].size() >= maxi_cap) break;
                 }
             }
         }
+        // std::cout<<"cur_cap:"<<part_node[cur_p].size()<<std::endl;
         if(part_node[cur_p].size() >= maxi_cap){   
+            // std::cout<<"new part"<<std::endl;
             score_list.clear();
             cur_p += 1;
         }
     }
 
-    clock_t end_time = clock();
+    auto end_time = std::chrono::high_resolution_clock::now();
     int k_1 = 0;
     for(int i=0;i<p;i++) {
         k_1 += part_edge[i].size();
+        // std::cout<<"part_edge["<<i<<"]:"<<part_edge[i].size()<<std::endl;
     }
+    // std::cout<<"cnt:"<<cnt<<" cntt:"<<cntt<<" maxi_cap:"<<maxi_cap<<std::endl;
     
-    clock_t runtime = (end_time-beg_time)*1000/CLOCKS_PER_SEC;
+    for(int i=0;i<m;i++){
+        if(Edge[i].degree!=0){
+            k_1--; 
+        }
+    } 
+    double runtime = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - beg_time).count();
     std::cout<<"runtime:"<<runtime <<"ms"<<std::endl;
-    std::cout<<"k-1:"<<k_1-m<<std::endl;
+    std::cout<<"k-1:"<<k_1<<std::endl;
     if(output != "None"){
         FILE *result;
         result = fopen(output.c_str(),"w");
@@ -257,7 +266,12 @@ void parsingCmd(int argc,char *argv[]){
     std::string input="../data/out.github";
     n = 56530;
     m = 120869;
-    int p = 16;
+
+    // std::string input="../data/BA-1B.txt";
+    // n = 5e8 + 2;
+    // m = 5e8 + 2;
+
+    int p = 2;
     double sheild_heavy_node = 0.2;
     std::string save = "None";
     double e = 0;
